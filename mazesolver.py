@@ -76,38 +76,43 @@ def isDeadEnd():
 def isAnyDecision():
     count = 0
     if not (obstacleCheck(goRight(currentPoint)) == '1'):
-        count =+ 1
+        count = count + 1
     if not (obstacleCheck(goLeft(currentPoint)) == '1'):
-        count =+ 1
+        count = count + 1
     if not (obstacleCheck(goUp(currentPoint)) == '1'):
-        count =+ 1
+        count = count + 1
     if not (obstacleCheck(goDown(currentPoint)) == '1'):
-        count =+ 1
+        count = count + 1
     return count > 2
 
 def queueListing():
     global queueMove
     listDistance = []
-    listDistance.append(0, manhattanDistance(goRight(startPoint), finishPoint))
-    listDistance.append(1, manhattanDistance(goLeft(startPoint), finishPoint))
-    listDistance.append(2, manhattanDistance(goUp(startPoint), finishPoint))
-    listDistance.append(3, manhattanDistance(goDown(startPoint), finishPoint))
+
+    if not (obstacleCheck(goRight(currentPoint)) == '1'):
+        listDistance.append((0, manhattanDistance(goRight(currentPoint), finishPoint)))
+    if not (obstacleCheck(goLeft(currentPoint)) == '1'):
+        listDistance.append((1, manhattanDistance(goLeft(currentPoint), finishPoint)))
+    if not (obstacleCheck(goUp(currentPoint)) == '1'):
+        listDistance.append((2, manhattanDistance(goUp(currentPoint), finishPoint)))
+    if not (obstacleCheck(goDown(currentPoint)) == '1'):
+        listDistance.append((3, manhattanDistance(goDown(currentPoint), finishPoint)))
 
     listDistance.sort(key=lambda tup: tup[1])
 
     for i in listDistance:
-        queueMove.add((currentPoint, i[0]))
+        queueMove.put((currentPoint, i[0]))
     #make queue w/ (point, move) w/ shortest distance priority
 
 
 def goWithFlow():
     if not (lastMove == 1) and not (obstacleCheck(goRight(currentPoint)) == '1'):
         doMoveRight()
-    if not (lastMove == 0) and not (obstacleCheck(goLeft(currentPoint)) == '1'):
+    elif not (lastMove == 0) and not (obstacleCheck(goLeft(currentPoint)) == '1'):
         doMoveLeft()
-    if not (lastMove == 3) and not (obstacleCheck(goUp(currentPoint)) == '1'):
+    elif not (lastMove == 3) and not (obstacleCheck(goUp(currentPoint)) == '1'):
         doMoveUp()
-    if not (lastMove == 2) and not (obstacleCheck(goDown(currentPoint)) == '1'):
+    elif not (lastMove == 2) and not (obstacleCheck(goDown(currentPoint)) == '1'):
         doMoveDown()
 
 fileName = "maze_small.txt"
