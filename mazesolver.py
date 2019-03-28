@@ -1,4 +1,5 @@
-import queue
+from colorama import Fore, Back, Style
+import queue, sys
 
 def manhattanDistance(p1, p2):
     return abs(p1[0]-p2[0])+abs(p1[1]-p2[1])
@@ -26,28 +27,32 @@ def setMaze(point, c):
     maze[point[1]][point[0]] = c
 
 def doMoveRight():
-    global currentPoint, lastMove
+    global currentPoint, lastMove, predList
+    pred = currentPoint
     currentPoint = goRight(currentPoint)
     lastMove = 0
-    setMaze(currentPoint, '#')
+    predList.append((pred, currentPoint))
 
 def doMoveLeft():
-    global currentPoint, lastMove
+    global currentPoint, lastMove, predList
+    pred = currentPoint
     currentPoint = goLeft(currentPoint)
     lastMove = 1
-    setMaze(currentPoint, '#')
+    predList.append((pred, currentPoint))
 
 def doMoveUp():
-    global currentPoint, lastMove
+    global currentPoint, lastMove, predList
+    pred = currentPoint
     currentPoint = goUp(currentPoint)
     lastMove = 2
-    setMaze(currentPoint, '#')
+    predList.append((pred, currentPoint))
 
 def doMoveDown():
-    global currentPoint, lastMove
+    global currentPoint, lastMove, predList
+    pred = currentPoint
     currentPoint = goDown(currentPoint)
     lastMove = 3
-    setMaze(currentPoint, '#')
+    predList.append((pred, currentPoint))
 
 def moveBacktrack(tupleMove):
     global currentPoint
@@ -104,7 +109,6 @@ def queueListing():
         queueMove.put((currentPoint, i[0]))
     #make queue w/ (point, move) w/ shortest distance priority
 
-
 def goWithFlow():
     if not (lastMove == 1) and not (obstacleCheck(goRight(currentPoint)) == '1'):
         doMoveRight()
@@ -115,14 +119,21 @@ def goWithFlow():
     elif not (lastMove == 2) and not (obstacleCheck(goDown(currentPoint)) == '1'):
         doMoveDown()
 
-fileName = "maze_small.txt"
+def popUntil(point):
+    global predList
+    while not (predList[len(predList)-1][1] == point):
+        predList.pop(len(predList)-1)
+        if(len(predList) == 0):
+            break
+
+fileName = "maze_xlarge.txt"
 fileInput = open(fileName, "r");
 
 maze = []
-queueMove = queue.Queue(maxsize=20)
+predList = []
+queueMove = queue.Queue()
 
 strMaze = fileInput.read()
-print(strMaze)
 
 listStrMaze = strMaze.split('\n')
 for i in range(0,len(listStrMaze)-1):
@@ -141,6 +152,7 @@ for i in range(0, len(maze)):
 
 currentPoint = startingPoint
 
+
 doMoveRight()
 while not isFinish():
     if isAnyDecision():
@@ -151,7 +163,25 @@ while not isFinish():
     else:
         goWithFlow()
 
-for i in maze:
-    print('\n')
-    for j in i:
-        print(j),
+setMaze(startingPoint, '#')
+while not (len(predList) == 0):
+    markPoint = predList[len(predList)-1][1]
+    setMaze(markPoint, '#')
+    popUntil(predList[len(predList)-1][0])
+
+for i in range(0,len(maze[1])):
+    sys.stdout.write('\n')
+    sys.stdout.flush()
+    for j in range(0,len(maze[1])):
+        if maze[i][j] == '1':
+            sys.stdout.write(Back.BLACK + " ")
+            sys.stdout.flush()
+        elif maze[i][j] == '#':
+            sys.stdout.write(Back.GREEN + " ")
+            sys.stdout.flush()
+        elif maze[i][j] == '0':
+            sys.stdout.write(Back.WHITE + " ")
+            sys.stdout.flush()
+
+sys.stdout.write('\n')
+sys.stdout.flush()
