@@ -1,5 +1,7 @@
-from colorama import Fore, Back, Style
-import queue, sys
+from colorama import init, Fore, Back, Style
+import os, queue, sys
+
+init()
 
 def manhattanDistance(p1, p2):
     return abs(p1[0]-p2[0])+abs(p1[1]-p2[1])
@@ -126,7 +128,33 @@ def popUntil(point):
         if(len(predList) == 0):
             break
 
-fileName = "maze_xlarge.txt"
+#File Input
+print("Pilih file maze-nya :")
+path = "maze"
+dirs = os.listdir(path)
+i = 0
+for file in dirs:
+	i = i + 1
+	print(str(i) + ". " + file)
+print("0. Keluar")
+pilihan = int(input("Pilih nomor berapa? "))
+
+if(pilihan == 0):
+	exit()
+
+i = 1
+fileName = ""
+for file in dirs:
+	if(i == pilihan):
+		fileName = file
+	i = i+1
+
+if (fileName == ""):
+	print("Pilihan tidak tersedia.")
+	exit()
+
+fileName = ("maze/"+fileName)
+
 fileInput = open(fileName, "r");
 
 maze = []
@@ -151,7 +179,6 @@ for i in range(0, len(maze)):
         break
 
 currentPoint = startingPoint
-
 
 doMoveRight()
 while not isFinish():
